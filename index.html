@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QuackCoin — utility that quacks 🦆</title>
+    <link rel="icon" type="image/x-icon" href="public/favicon.ico">
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <img src="public/quack-coin.png" alt="QuackCoin Logo" class="logo-img">
+                <span class="logo-text">QuackCoin</span>
+            </div>
+            <button class="hamburger" id="hamburger" aria-label="Menu">
+                <span class="hamburger-line"></span>
+                <span class="hamburger-line"></span>
+                <span class="hamburger-line"></span>
+            </button>
+            <ul class="nav-menu" id="navMenu">
+                <li><a href="#home">🏠 Home</a></li>
+                <li><a href="#about">💎 About</a></li>
+                <li><a href="#tokenomics">📊 Tokenomics</a></li>
+                <li><a href="#airdrop">🎁 Waitlist</a></li>
+                <li><a href="#roadmap">🗺️ Roadmap</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section id="home" class="hero">
+        <div class="hero-content">
+            <img src="public/quack-coin.png" alt="QuackCoin" class="hero-logo">
+            <h1 class="hero-title"><img src="public/rubber-duck.png" alt="🦆" class="duck-icon"> QuackCoin — The coin
+                that quacks 🚀</h1>
+            <p class="hero-subtitle">
+                A private, invite-only ecosystem for smart shopping, education, and real rewards.
+                If it quacks, it works — built to be used every day.
+            </p>
+
+            <!-- Countdown -->
+            <div class="countdown-section">
+                <h2>⏰ Launch Countduck</h2>
+                <div class="countdown">
+                    <div class="countdown-item">
+                        <span class="countdown-value" id="days">00</span>
+                        <span class="countdown-label">Days</span>
+                    </div>
+                    <div class="countdown-item">
+                        <span class="countdown-value" id="hours">00</span>
+                        <span class="countdown-label">Hours</span>
+                    </div>
+                    <div class="countdown-item">
+                        <span class="countdown-value" id="minutes">00</span>
+                        <span class="countdown-label">Minutes</span>
+                    </div>
+                    <div class="countdown-item">
+                        <span class="countdown-value" id="seconds">00</span>
+                        <span class="countdown-label">Seconds</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Invite-only Callout -->
+            <div class="launch-price">
+                <h3>🔒 Invite-only access</h3>
+                <p class="price-range">Join the list and get early entry to the pond</p>
+            </div>
+
+            <div class="cta-buttons">
+                <a href="#airdrop" class="btn btn-primary">Get my invite</a>
+                <a href="#tokenomics" class="btn btn-secondary">View Tokenomics</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="section about-section">
+        <img src="public/about.png" alt="QuackCoin banner" class="about-banner">
+        <div class="container">
+            <h2 class="section-title">💎 About QuackCoin</h2>
+
+            <div class="about-content">
+                <div class="about-main">
+                    <h3><img src="public/rubber-duck.png" alt="🦆" class="duck-icon"> What is QuackCoin?</h3>
+                    <p>
+                        QuackCoin (QUACK) is a utility token powering a smart, private ecosystem.
+                        Inspired by the yellow duck, the brand is playful and memorable — while the infrastructure
+                        stays serious, transparent, and built for real use.
+                    </p>
+                    <p>
+                        Value is created through real activity: learning, smarter shopping, useful microtasks,
+                        premium benefits, and ecosystem participation.
+                        Think utility over hype — one quack at a time.
+                    </p>
+                    <p>
+                        This is a community that believes crypto can be simple, honest, and genuinely useful.
+                        In quack we trust.
+                    </p>
+                </div>
+
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <div class="feature-icon">💎</div>
+                        <h4>Utility Token</h4>
+                        <p>Built to be used, not hoarded</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">👥</div>
+                        <h4>Community First</h4>
+                        <p>Smart ducks quack together</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">🚀</div>
+                        <h4>Future Ready</h4>
+                        <p>Staking, perks, and smart integrations</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Tokenomics Section -->
+    <section id="tokenomics" class="section tokenomics-section">
+        <img src="public/spend-less-quack-more.png" alt="Spend less, quack more" class="section-banner">
+        <div class="container">
+            <h2 class="section-title">📊 Tokenomics, Quackconomy & Distribution</h2>
+
+            <div class="tokenomics-content">
+                <div class="total-supply">
+                    <h3>💎 Fixed Total Supply</h3>
+                    <p class="supply-amount">1,000,000,000</p>
+                    <p class="supply-token">QUACK</p>
+                </div>
+
+                <div class="distribution">
+                    <h3>📈 Distribution</h3>
+                    <table class="distribution-table">
+                        <thead>
+                            <tr>
+                                <th>Allocation</th>
+                                <th>%</th>
+                                <th>Amount</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>⭐ Community & Rewards</td>
+                                <td>35%</td>
+                                <td>350M QUACK</td>
+                            </tr>
+                            <tr>
+                                <td>🏦 Staking Pool</td>
+                                <td>20%</td>
+                                <td>200M QUACK</td>
+                            </tr>
+                            <tr>
+                                <td>💧 Liquidity</td>
+                                <td>10%</td>
+                                <td>100M QUACK</td>
+                            </tr>
+                            <tr>
+                                <td>🏗️ Project Treasury</td>
+                                <td>15%</td>
+                                <td>150M QUACK</td>
+                            </tr>
+                            <tr>
+                                <td>👥 Team & Founders</td>
+                                <td>10%</td>
+                                <td>100M QUACK</td>
+                            </tr>
+                            <tr>
+                                <td>🤝 Partnerships & Marketing</td>
+                                <td>5%</td>
+                                <td>50M QUACK</td>
+                            </tr>
+                            <tr>
+                                <td>🔒 Strategic Reserve</td>
+                                <td>5%</td>
+                                <td>50M QUACK</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="release-schedule">
+                    <h3>📅 Vesting & Unlocks</h3>
+                    <p>
+                        🔐 Controlled unlocks to keep the pond healthy.
+                        <strong>Team & Founders:</strong> 12-month cliff + 36-month linear vesting →
+                        <strong>Partnerships:</strong> milestone-based unlocks →
+                        <strong>Rewards:</strong> activity-based emissions with clear limits
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Use Cases Section -->
+    <section class="section use-cases-section">
+        <div class="container">
+            <img src="public/smart-dusck-quack-togheter.png" alt="Smart ducks quack together" class="section-banner">
+            <h2 class="section-title">⚡ How QuackCoin is used</h2>
+            <div class="use-cases-grid">
+                <div class="use-case-card">
+                    <div class="use-case-icon">🎓</div>
+                    <h4>Smart Educkation</h4>
+                    <p>Learn, unlock perks, and level up</p>
+                </div>
+                <div class="use-case-card">
+                    <div class="use-case-icon">🛒</div>
+                    <h4>Shopping & Quackback</h4>
+                    <p>Spend less, quack more</p>
+                </div>
+                <div class="use-case-card">
+                    <div class="use-case-icon">🧩</div>
+                    <h4>Useful Microquacks</h4>
+                    <p>Earn for legit, verified actions</p>
+                </div>
+                <div class="use-case-card">
+                    <div class="use-case-icon">🎟️</div>
+                    <h4>Memberships & Benefits</h4>
+                    <p>Premium access and higher limits</p>
+                </div>
+                <div class="use-case-card">
+                    <div class="use-case-icon">🧊</div>
+                    <h4>Sustainable Staking</h4>
+                    <p>Slow quack, strong quack</p>
+                </div>
+                <div class="use-case-card">
+                    <div class="use-case-icon">🗳️</div>
+                    <h4>Future Governance</h4>
+                    <p>Vote on the pond, not the hype</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Airdrop Section -->
+    <section id="airdrop" class="section airdrop-section">
+        <img src="public/in-quack-we-trust.png" alt="In quack we trust" class="section-banner">
+        <div class="container">
+            <h2 class="section-title">🎁 Waitlist & Airdrops</h2>
+
+            <div class="airdrop-content">
+                <h3>🎊 Welcome to the pond</h3>
+                <p>
+                    Airdrops roll out in waves to verified members and <strong>early quackers</strong>
+                    who help shape the community from day one 👥. Eligibility includes:
+                </p>
+
+                <form class="waitlist-form" id="waitlistForm"
+                    data-endpoint="https://api.hsforms.com/submissions/v3/integration/submit/50861946/50fee985-4529-4dcc-971c-18efac2854bf">
+                    <div class="form-row">
+                        <label for="waitlistName">First name</label>
+                        <input type="text" id="waitlistName" name="firstname" data-hubspot-name="firstname"
+                            placeholder="Your name" autocomplete="name" required>
+                    </div>
+                    <div class="form-row">
+                        <label for="waitlistEmail">Email</label>
+                        <input type="email" id="waitlistEmail" name="email" data-hubspot-name="email"
+                            placeholder="you@email.com" autocomplete="email" required>
+                    </div>
+                    <label class="consent-row">
+                        <input type="checkbox" id="waitlistConsent" name="consent" required>
+                        <span>I agree to receive QuackCoin updates.</span>
+                    </label>
+                    <input type="hidden" id="utmSource" name="utm_source" data-hubspot-name="utm_source">
+                    <input type="hidden" id="utmMedium" name="utm_medium" data-hubspot-name="utm_medium">
+                    <input type="hidden" id="utmCampaign" name="utm_campaign" data-hubspot-name="utm_campaign">
+                    <input type="hidden" id="utmContent" name="utm_content" data-hubspot-name="utm_content">
+                    <input type="hidden" id="utmTerm" name="utm_term" data-hubspot-name="utm_term">
+                    <input type="hidden" id="referrerUrl" name="referrer" data-hubspot-name="referrer">
+                    <input type="hidden" id="landingUrl" name="landing_url" data-hubspot-name="landing_url">
+                    <button type="submit" class="btn btn-primary btn-large">Get my invite</button>
+                    <p class="form-status" id="waitlistStatus" role="status" aria-live="polite"></p>
+                </form>
+
+                <div class="airdrop-eligibility">
+                    <div class="eligibility-item">
+                        <span class="check">✅</span>
+                        <span>Active ecosystem users</span>
+                    </div>
+                    <div class="eligibility-item">
+                        <span class="check">✅</span>
+                        <span>Early supporters</span>
+                    </div>
+                    <div class="eligibility-item">
+                        <span class="check">✅</span>
+                        <span>Community participants</span>
+                    </div>
+                    <div class="eligibility-item">
+                        <span class="check">✅</span>
+                        <span>Verified followers and invitees</span>
+                    </div>
+                </div>
+
+                <div class="airdrop-features">
+                    <div class="airdrop-feature">
+                        <span class="feature-emoji">📸</span>
+                        <span>Snapshot-based drops</span>
+                    </div>
+                    <div class="airdrop-feature">
+                        <span class="feature-emoji">🛡️</span>
+                        <span>Anti-bot protection</span>
+                    </div>
+                    <div class="airdrop-feature">
+                        <span class="feature-emoji">🔄</span>
+                        <span>Multiple rounds</span>
+                    </div>
+                </div>
+
+                <div class="cta-buttons">
+                    <a href="#roadmap" class="btn btn-primary btn-large">See the roadmap</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Roadmap Section -->
+    <section id="roadmap" class="section roadmap-section">
+        <div class="container">
+            <img src="public/powered-by-quacks.png" alt="Powered by quacks" class="section-banner">
+            <h2 class="section-title">🗺️ Roadmap</h2>
+
+            <div class="roadmap-layout">
+                <div class="roadmap-media">
+                    <img src="public/roadmap-duck.png" alt="QuackCoin roadmap" class="roadmap-duck">
+                </div>
+                <div class="roadmap-timeline">
+                    <div class="roadmap-item">
+                        <div class="roadmap-year">Phase 1 📐</div>
+                        <div class="roadmap-phase">Foundation</div>
+                        <div class="roadmap-details">
+                            Concept → Design → Community → Early partnerships
+                        </div>
+                    </div>
+
+                    <div class="roadmap-item highlighted">
+                        <div class="roadmap-year">Phase 2 🚀</div>
+                        <div class="roadmap-phase">Controlled Launch</div>
+                        <div class="roadmap-details">
+                            Invites → Airdrops → Ecosystem integration → Growth
+                        </div>
+                    </div>
+
+                    <div class="roadmap-item">
+                        <div class="roadmap-year">Phase 3 🌟</div>
+                        <div class="roadmap-phase">Expansion</div>
+                        <div class="roadmap-details">
+                            New features → Ecosystem growth → Strategic partnerships
+                        </div>
+                    </div>
+
+                    <div class="roadmap-item">
+                        <div class="roadmap-year">Phase 4 💫</div>
+                        <div class="roadmap-phase">Future</div>
+                        <div class="roadmap-details">
+                            Governance → Advanced staking → External integrations
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3><img src="public/rubber-duck.png" alt="🦆" class="duck-icon"> QuackCoin</h3>
+                    <p> The coin that quacks. Built to be used, not hyped 💎</p>
+                    <div class="footer-badges">
+                        <span class="badge">👁️ Transparent</span>
+                        <span class="badge">🔒 Secure</span>
+                        <span class="badge">👥 Community</span>
+                    </div>
+                </div>
+
+                <div class="footer-section">
+                    <h4>🔗 Quick Links</h4>
+                    <ul class="footer-links">
+                        <li><a href="#about">💎 About</a></li>
+                        <li><a href="#tokenomics">📊 Tokenomics</a></li>
+                        <li><a href="#airdrop">🎁 Waitlist</a></li>
+                        <li><a href="#roadmap">🗺️ Roadmap</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-section">
+                    <h4>💬 Connect</h4>
+                    <p class="footer-contact">support@quackcoin.com</p>
+                </div>
+            </div>
+
+            <div class="footer-bottom">
+                <p>&copy; 2025 QuackCoin. All rights reserved. <img src="public/rubber-duck.png" alt="🦆"
+                        class="duck-icon"></p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+
+</html>

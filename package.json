@@ -1,0 +1,26 @@
+{
+  "name": "quack-coin-landing-page",
+  "version": "1.0.0",
+  "description": "Official QuackCoin landing page - The most fun cryptocurrency in the universe!",
+  "main": "index.js",
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc --watch",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Pedrocorgnati/quack-coin-landing-page.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/Pedrocorgnati/quack-coin-landing-page/issues"
+  },
+  "homepage": "https://github.com/Pedrocorgnati/quack-coin-landing-page#readme",
+  "devDependencies": {
+    "typescript": "^5.9.3"
+  }
+}
