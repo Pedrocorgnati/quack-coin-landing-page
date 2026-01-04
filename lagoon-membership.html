@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QuackCoin Dashboard - Lagoon Membership</title>
+    <link rel="icon" type="image/x-icon" href="public/favicon.ico">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="dashboard.css">
+</head>
+
+<body class="dashboard-body">
+    <div class="dashboard">
+        <aside class="sidebar">
+            <div class="sidebar-brand">
+                <img src="public/quack-coin.png" alt="QuackCoin Logo" class="sidebar-logo">
+                <div class="sidebar-title">
+                    <span class="brand-name">QuackCoin</span>
+                    <span class="brand-subtitle">Private Dashboard</span>
+                </div>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="dashboard.html">Overview</a>
+                <a href="activity.html">Activity</a>
+                <a href="rewards.html">Free Quack</a>
+                <a class="active" href="lagoon-membership.html">Lagoon Membership</a>
+                <a href="quack-stacking.html">Quack Stacking</a>
+                <a href="education.html">Education</a>
+                <a href="settings.html">Settings</a>
+            </nav>
+            <div class="sidebar-footer">
+                <span class="status-dot"></span>
+                Logged in as quack
+            </div>
+        </aside>
+
+        <div class="dashboard-content">
+            <header class="dashboard-header">
+                <div class="header-left">
+                    <span class="header-title">Lagoon Membership</span>
+                    <span class="header-tag">Invite-only</span>
+                </div>
+                <div class="header-right">
+                    <button class="header-btn">New task</button>
+                    <button class="header-btn header-btn-ghost" id="logoutButton">Sair</button>
+                    <img class="header-avatar" src="public/user.png" alt="User">
+                </div>
+            </header>
+
+            <main class="dashboard-main">
+                <section class="welcome-card">
+                    <div class="welcome-text">
+                        <h1>Welcome to Lagoon Membership.</h1>
+                        <h3>Boost your Earnings</h3>
+                        <h4>Upgrading your Membership gives you a much higher APY for your Staking</h4>
+                    </div>
+                    <div class="welcome-text">
+                        <h2>My Current Membership.</h2>
+                        <p>Bronze APY 75%</p>
+                    </div>
+                </section>
+                <section class="welcome-card">
+                    <div class="welcome-text">
+                        <div class="membership-row membership-row-title">
+                            <h1>Welcome to Lagoon Membership.</h1>
+                        </div>
+                        <div class="membership-row membership-row-narrow">
+                            <h3>🔓 No Membership APY 25%</h3>
+                            <button class="membership-buy" type="button">Buy</button>
+                        </div>
+                        <div class="membership-row membership-row-narrow">
+                            <h3>🥉 Bronze APY 75%</h3>
+                            <button class="membership-buy" type="button">Buy</button>
+                        </div>
+                        <div class="membership-row membership-row-narrow">
+                            <h3>🥈 Silver APY 125%</h3>
+                            <button class="membership-buy" type="button">Buy</button>
+                        </div>
+                        <div class="membership-row membership-row-narrow">
+                            <h3>🥇 Gold APY 175%</h3>
+                            <button class="membership-buy" type="button">Buy</button>
+                        </div>
+                        <div class="membership-row membership-row-narrow">
+                            <h3>💠 Platinum APY 325%</h3>
+                            <button class="membership-buy" type="button">Buy</button>
+                        </div>
+                        <div class="membership-row membership-row-narrow">
+                            <h3>💎 Diamond APY 500%</h3>
+                            <button class="membership-buy" type="button">Buy</button>
+                        </div>
+                    </div>
+                </section>
+            </main>
+        </div>
+    </div>
+    <script src="dashboard.js"></script>
+</body>
+
+</html>

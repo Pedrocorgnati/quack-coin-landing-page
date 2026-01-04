@@ -18,6 +18,7 @@ class QuackCoinLandingPage {
         this.setupScrollAnimations();
         this.setupNavbarScroll();
         this.setupMobileMenu();
+        this.setupLoginDialog();
         this.setupWaitlistForm();
     }
     hasCountdown() {
@@ -148,6 +149,79 @@ class QuackCoinLandingPage {
                 navMenu.classList.remove('active');
             }
         });
+    }
+    setupLoginDialog() {
+        const loginButton = document.getElementById('loginButton');
+        const loginDialog = document.getElementById('loginDialog');
+        const loginForm = document.getElementById('loginForm');
+        const loginStatus = document.getElementById('loginStatus');
+        const loginClose = document.getElementById('loginClose');
+        const loginUser = document.getElementById('loginUser');
+        const loginPass = document.getElementById('loginPass');
+        if (!loginButton ||
+            !(loginDialog instanceof HTMLDialogElement) ||
+            !(loginForm instanceof HTMLFormElement) ||
+            !(loginStatus instanceof HTMLElement) ||
+            !(loginClose instanceof HTMLElement) ||
+            !(loginUser instanceof HTMLInputElement) ||
+            !(loginPass instanceof HTMLInputElement)) {
+            return;
+        }
+        const storageKey = 'quack_login_ok';
+        const updateLoginState = (isLogged) => {
+            loginButton.textContent = isLogged ? 'Logado' : 'Login';
+            loginButton.classList.toggle('is-logged', isLogged);
+        };
+        const hasLogin = window.localStorage.getItem(storageKey) === '1';
+        updateLoginState(hasLogin);
+        loginButton.addEventListener('click', () => {
+            loginStatus.textContent = '';
+            loginStatus.classList.remove('error', 'success');
+            loginForm.reset();
+            loginDialog.showModal();
+            this.positionLoginDialog(loginDialog, loginButton);
+        });
+        loginClose.addEventListener('click', () => {
+            loginDialog.close();
+        });
+        loginDialog.addEventListener('click', (event) => {
+            if (event.target === loginDialog) {
+                loginDialog.close();
+            }
+        });
+        loginForm.addEventListener('submit', (event) => {
+            event.preventDefault();
+            const username = loginUser.value.trim();
+            const password = loginPass.value.trim();
+            if (username === 'quack' && password === 'quack123') {
+                loginStatus.textContent = 'Login feito!';
+                loginStatus.classList.remove('error');
+                loginStatus.classList.add('success');
+                window.localStorage.setItem(storageKey, '1');
+                updateLoginState(true);
+                window.setTimeout(() => {
+                    loginDialog.close();
+                    window.location.href = 'dashboard.html';
+                }, 300);
+                return;
+            }
+            loginStatus.textContent = 'Usuario ou senha invalidos.';
+            loginStatus.classList.add('error');
+            loginStatus.classList.remove('success');
+            window.localStorage.removeItem(storageKey);
+            updateLoginState(false);
+        });
+    }
+    positionLoginDialog(dialog, button) {
+        const margin = 12;
+        const rect = button.getBoundingClientRect();
+        const dialogRect = dialog.getBoundingClientRect();
+        const top = Math.min(rect.bottom + margin, window.innerHeight - dialogRect.height - margin);
+        const maxLeft = window.innerWidth - dialogRect.width - margin;
+        const left = Math.max(margin, Math.min(rect.left, maxLeft));
+        dialog.style.top = `${Math.max(margin, top)}px`;
+        dialog.style.left = `${left}px`;
+        dialog.style.transform = 'none';
     }
     setupWaitlistForm() {
         const form = document.getElementById('waitlistForm');

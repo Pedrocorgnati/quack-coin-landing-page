@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QuackCoin Dashboard</title>
+    <link rel="icon" type="image/x-icon" href="public/favicon.ico">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="dashboard.css">
+</head>
+
+<body class="dashboard-body">
+    <div class="dashboard">
+        <aside class="sidebar">
+            <div class="sidebar-brand">
+                <img src="public/quack-coin.png" alt="QuackCoin Logo" class="sidebar-logo">
+                <div class="sidebar-title">
+                    <span class="brand-name">QuackCoin</span>
+                    <span class="brand-subtitle">Private Dashboard</span>
+                </div>
+            </div>
+            <nav class="sidebar-nav">
+                <a class="active" href="dashboard.html">Overview</a>
+                <a href="activity.html">Activity</a>
+                <a href="rewards.html">Free Quack</a>
+                <a href="quack-stacking.html">Quack Stacking</a>
+                <a href="lagoon-membership.html">Lagoon Membership</a>
+                <a href="education.html">Education</a>
+                <a href="settings.html">Settings</a>
+            </nav>
+            <div class="sidebar-footer">
+                <span class="status-dot"></span>
+                Logged into the lagoon
+            </div>
+        </aside>
+
+        <div class="dashboard-content">
+            <header class="dashboard-header">
+                <div class="header-left">
+                    <span class="header-title">Dashboard</span>
+                    <span class="header-tag">Invite-only</span>
+                </div>
+                <div class="header-right">
+                    <button class="header-btn">New task</button>
+                    <button class="header-btn header-btn-ghost" id="logoutButton">Sair</button>
+                    <img class="header-avatar" src="public/user.png" alt="User">
+                </div>
+            </header>
+
+            <main class="dashboard-main">
+                <section class="welcome-card">
+                    <div class="welcome-text">
+                        <h1>Welcome to Overview.</h1>
+                        <p>Your dashboard overview will appear here soon.</p>
+                    </div>
+                </section>
+            </main>
+        </div>
+    </div>
+    <script src="dashboard.js"></script>
+</body>
+
+</html>

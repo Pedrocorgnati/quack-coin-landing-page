@@ -29,8 +29,29 @@
                 <li><a href="#airdrop">🎁 Waitlist</a></li>
                 <li><a href="#roadmap">🗺️ Roadmap</a></li>
             </ul>
+            <div class="nav-actions">
+                <button class="nav-login" id="loginButton" type="button">Login</button>
+            </div>
         </div>
     </nav>
+    <dialog class="login-dialog" id="loginDialog" aria-labelledby="loginTitle">
+        <form class="login-form" id="loginForm" method="dialog">
+            <div class="login-header">
+                <h3 id="loginTitle">Login</h3>
+                <button class="login-close" id="loginClose" type="button" aria-label="Fechar">×</button>
+            </div>
+            <label class="login-field">
+                Usuario
+                <input type="text" id="loginUser" name="loginUser" autocomplete="username" required>
+            </label>
+            <label class="login-field">
+                Senha
+                <input type="password" id="loginPass" name="loginPass" autocomplete="current-password" required>
+            </label>
+            <p class="login-status" id="loginStatus" role="status"></p>
+            <button class="btn btn-primary login-submit" type="submit">Entrar</button>
+        </form>
+    </dialog>
 
     <!-- Hero Section -->
     <section id="home" class="hero">
