@@ -1,0 +1,17 @@
+# CODEOWNERS — auto-request review from the responsible team.
+# See: https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
+
+# Default owner for everything
+*                             @owner-username
+
+# Deployment and infrastructure — require senior review
+ecosystem.config.js           @owner-username
+deployment/                   @owner-username
+.github/workflows/            @owner-username
+
+# Database migrations — always require review
+prisma/migrations/            @owner-username
+
+# Auth and security-sensitive paths
+lib/auth/                     @owner-username
+app/api/auth/                 @owner-username

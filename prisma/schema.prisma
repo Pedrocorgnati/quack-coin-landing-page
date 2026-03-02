@@ -1,0 +1,869 @@
+// Prisma Schema — QuackCoin Platform
+// Full 37-model schema across 13 domains.
+// Generated: module-02-shared-foundations / TASK-1
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../lib/generated/prisma"
+}
+
+datasource db {
+  provider = "mysql"
+}
+
+// ═══════════════════════════════════════════════════════════════
+// ENUMS
+// ═══════════════════════════════════════════════════════════════
+
+enum Role {
+  USER
+  ADMIN
+}
+
+enum MembershipTier {
+  FREE
+  SILVER
+  GOLD
+  PLATINUM
+}
+
+enum TransactionType {
+  EARN
+  SPEND
+  REFUND
+  REWARD
+  BONUS
+  REFERRAL
+}
+
+enum StakingEventType {
+  DEPOSIT
+  WITHDRAWAL
+  REWARD
+  PENALTY
+}
+
+enum StakingStatus {
+  ACTIVE
+  UNSTAKING
+  COMPLETED
+}
+
+enum PaymentStatus {
+  PENDING
+  CONFIRMED
+  FAILED
+  EXPIRED
+  REFUNDED
+}
+
+enum CourseStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
+enum LessonType {
+  VIDEO
+  ARTICLE
+  QUIZ
+  ASSIGNMENT
+}
+
+enum NotificationType {
+  NEW_MESSAGE
+  BADGE_EARNED
+  RAFFLE_WON
+  QC_EARNED
+  COURSE_COMPLETED
+  LESSON_COMPLETED
+  REFERRAL_REWARD
+  MEMBERSHIP_EXPIRING
+  SYSTEM
+  PROMO
+}
+
+enum BadgeCategory {
+  LEARNING
+  TRADING
+  SOCIAL
+  LOYALTY
+  ACHIEVEMENT
+  SPECIAL
+}
+
+enum RaffleStatus {
+  UPCOMING
+  ACTIVE
+  DRAWING
+  COMPLETED
+  CANCELLED
+}
+
+enum MessageStatus {
+  SENT
+  DELIVERED
+  READ
+}
+
+enum ConversationStatus {
+  OPEN
+  RESOLVED
+  PENDING
+}
+
+// ═══════════════════════════════════════════════════════════════
+// DOMAIN 1: AUTH
+// ═══════════════════════════════════════════════════════════════
+
+// ── User ──────────────────────────────────────────────────────
+model User {
+  id                    String    @id @default(cuid())
+  email                 String    @unique @db.VarChar(255)
+  emailVerified         Boolean   @default(false)
+  emailVerifiedAt       DateTime?
+  name                  String?   @db.VarChar(100)
+  username              String?   @unique @db.VarChar(50)
+  avatarUrl             String?   @db.VarChar(500)
+  bio                   String?   @db.Text
+  role                  Role      @default(USER)
+
+  // Membership
+  membershipTier        MembershipTier @default(FREE)
+  membershipExpiresAt   DateTime?
+
+  // Password — bcrypt hash (cost 12). Null for OAuth-only accounts.
+  passwordHash          String?   @db.VarChar(72)
+
+  // 2FA — twoFactorSecret encrypted at rest with AES-256-GCM (see lib/crypto.ts)
+  twoFactorEnabled      Boolean   @default(false)
+  twoFactorSecret       String?   @db.VarChar(512) // AES-256-GCM encrypted
+  backupCodeHashes      String?   @db.Text            // JSON array of bcrypt hashes
+
+  // Solana wallet
+  solanaWalletAddress   String?   @db.VarChar(44)
+
+  // Invite system
+  invitedById           String?
+  invitedBy             User?     @relation("UserInvites", fields: [invitedById], references: [id], onDelete: SetNull)
+  invitees              User[]    @relation("UserInvites")
+  inviteCodesIssued     InviteCode[]
+
+  // Status
+  isBanned              Boolean   @default(false)
+  bannedAt              DateTime?
+  bannedReason          String?   @db.VarChar(500)
+  lastLoginAt           DateTime?
+  lastLoginIp           String?   @db.VarChar(45)
+
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  // Relations
+  sessions              Session[]
+  otpTokens             OTPToken[]
+  passwordResetTokens   PasswordResetToken[]
+  emailVerificationTokens EmailVerificationToken[]
+  qcTransactions        QuackCoinTransaction[]
+  membershipPayments    MembershipPayment[]
+  solanaPaymentSessions SolanaPaymentSession[]
+  stakingPositions      StakingPosition[]
+  courseEnrollments     CourseEnrollment[]
+  courseProgress        CourseProgress[]
+  lessonProgress        LessonProgress[]
+  certificates          Certificate[]
+  affiliateLinks        AffiliateLink[]
+  cashbackTransactions  CashbackTransaction[]
+  userBadges            UserBadge[]
+  raffleTickets         RaffleTicket[]
+  raffleWins            RaffleWinner[]
+  conversationsAsUser   Conversation[] @relation("ConversationUser")
+  conversationsAsAdmin  Conversation[] @relation("ConversationAdmin")
+  messagesAuthor        Message[]
+  pushSubscriptions     PushSubscription[]
+  notifications         Notification[]
+  notificationPreferences NotificationPreference?
+  adminActions          AdminActionLog[]
+
+  @@index([email])
+  @@index([username])
+  @@index([role])
+  @@index([membershipTier])
+  @@index([solanaWalletAddress])
+  @@map("users")
+}
+
+// ── Session ───────────────────────────────────────────────────
+model Session {
+  id           String   @id @default(cuid())
+  userId       String
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  token        String   @unique @db.VarChar(512)
+  ipAddress    String?  @db.VarChar(45)
+  userAgent    String?  @db.VarChar(500)
+  expiresAt    DateTime
+  createdAt    DateTime @default(now())
+
+  @@index([userId])
+  @@index([token])
+  @@index([expiresAt])
+  @@map("sessions")
+}
+
+// ── OTPToken ──────────────────────────────────────────────────
+// Used for email OTP login and 2FA backup codes
+model OTPToken {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  code      String   @db.VarChar(8)
+  purpose   String   @db.VarChar(50) // "login" | "2fa_setup" | "email_verify"
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([code])
+  @@index([expiresAt])
+  @@map("otp_tokens")
+}
+
+// ── InviteCode ────────────────────────────────────────────────
+model InviteCode {
+  id          String   @id @default(cuid())
+  code        String   @unique @db.VarChar(20)
+  issuedById  String
+  issuedBy    User     @relation(fields: [issuedById], references: [id], onDelete: Cascade)
+  usedAt      DateTime?
+  usedByEmail String?  @db.VarChar(255)
+  maxUses     Int      @default(1)
+  useCount    Int      @default(0)
+  expiresAt   DateTime?
+  createdAt   DateTime @default(now())
+
+  @@index([code])
+  @@index([issuedById])
+  @@map("invite_codes")
+}
+
+// ── PasswordResetToken ────────────────────────────────────────
+model PasswordResetToken {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  token     String   @unique @db.VarChar(256)
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([token])
+  @@map("password_reset_tokens")
+}
+
+// ── EmailVerificationToken ────────────────────────────────────
+model EmailVerificationToken {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  token     String   @unique @db.VarChar(256)
+  email     String   @db.VarChar(255) // target email being verified
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([token])
+  @@map("email_verification_tokens")
+}
+
+// ═══════════════════════════════════════════════════════════════
+// DOMAIN 2: QC ECONOMY
+// ═══════════════════════════════════════════════════════════════
+
+// ── QuackCoinTransaction ──────────────────────────────────────
+// Immutable ledger — balance is always computed via SUM, never stored.
+model QuackCoinTransaction {
+  id               String          @id @default(cuid())
+  userId           String
+  user             User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  amount           Int             // positive for EARN/REFUND/REWARD/BONUS, negative for SPEND
+  type             TransactionType
+  reason           String          @db.VarChar(200)
+  idempotencyKey   String          @unique @db.VarChar(200) // prevents duplicate transactions
+  referenceId      String?         @db.VarChar(100) // external ref (courseId, raffleId, etc.)
+  referenceType    String?         @db.VarChar(50)  // "course" | "raffle" | "login" | etc.
+  createdAt        DateTime        @default(now())
+
+  @@index([userId])
+  @@index([type])
+  @@index([idempotencyKey])
+  @@index([createdAt])
+  @@map("quack_coin_transactions")
+}
+
+// ═══════════════════════════════════════════════════════════════
+// DOMAIN 3: MEMBERSHIP
+// ═══════════════════════════════════════════════════════════════
+
+// ── MembershipPayment ─────────────────────────────────────────
+model MembershipPayment {
+  id              String         @id @default(cuid())
+  userId          String
+  user            User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tier            MembershipTier
+  amountUsdc      String         @db.VarChar(50) // stored as string to preserve precision
+  txSignature     String?        @unique @db.VarChar(100) // Solana transaction signature
+  status          PaymentStatus  @default(PENDING)
+  validFrom       DateTime?
+  validUntil      DateTime?
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+
+  @@index([userId])
+  @@index([status])
+  @@index([txSignature])
+  @@map("membership_payments")
+}
+
+// ── SolanaPaymentSession ──────────────────────────────────────
+// Tracks USDC checkout sessions (Solana Pay QR codes)
+model SolanaPaymentSession {
+  id                  String        @id @default(cuid())
+  userId              String
+  user                User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  reference           String        @unique @db.VarChar(50) // Solana Pay reference (base58)
+  amountUsdc          String        @db.VarChar(50)
+  purpose             String        @db.VarChar(50) // "membership" | "staking" | etc.
+  purposeId           String?       @db.VarChar(100)
+  months              Int           @default(1)      // number of months purchased
+  membershipPaymentId String?       @db.VarChar(30)  // links to MembershipPayment.id
+  status              PaymentStatus @default(PENDING)
+  expiresAt           DateTime
+  confirmedAt         DateTime?
+  txSignature         String?       @db.VarChar(100)
+  createdAt           DateTime      @default(now())
+
+  @@index([userId])
+  @@index([reference])
+  @@index([status])
+  @@map("solana_payment_sessions")
+}
+
+// ═══════════════════════════════════════════════════════════════
+// DOMAIN 4: STAKING
+// ═══════════════════════════════════════════════════════════════
+
+// ── StakingPosition ───────────────────────────────────────────
+model StakingPosition {
+  id               String        @id @default(cuid())
+  userId           String
+  user             User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  amountQc         Int           // QC tokens staked
+  apy              Float         // APY at time of staking (e.g. 0.08 = 8%)
+  status           StakingStatus @default(ACTIVE)
+  stakedAt         DateTime      @default(now())
+  unstakeRequestAt DateTime?
+  unstakedAt       DateTime?
+  lastRewardAt     DateTime?
+  nextRewardAt     DateTime?
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @updatedAt
+
+  history          StakingHistory[]
+
+  @@index([userId])
+  @@index([status])
+  @@map("staking_positions")
+}
+
+// ── StakingHistory ────────────────────────────────────────────
+model StakingHistory {
+  id                String           @id @default(cuid())
+  stakingPositionId String
+  stakingPosition   StakingPosition  @relation(fields: [stakingPositionId], references: [id], onDelete: Cascade)
+  eventType         StakingEventType
+  amountQc          Int
+  balanceAfter      Int
+  note              String?          @db.VarChar(200)
+  createdAt         DateTime         @default(now())
+
+  @@index([stakingPositionId])
+  @@index([eventType])
+  @@map("staking_history")
+}
+
+// ═══════════════════════════════════════════════════════════════
+// DOMAIN 5: EDUCATION CMS
+// ═══════════════════════════════════════════════════════════════
+
+// ── Course ────────────────────────────────────────────────────
+model Course {
+  id          String       @id @default(cuid())
+  slug        String       @unique @db.VarChar(100)
+  title       String       @db.VarChar(200)
+  description String       @db.Text
+  thumbnailUrl String?     @db.VarChar(500)
+  status      CourseStatus @default(DRAFT)
+  qcReward    Int          @default(50) // QC earned on completion
+  sortOrder   Int          @default(0)
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  modules     CourseModule[]
+  enrollments CourseEnrollment[]
+  progress    CourseProgress[]
+  certificates Certificate[]
+
+  @@index([slug])
+  @@index([status])
+  @@map("courses")
+}
+
+// ── CourseModule ──────────────────────────────────────────────
+model CourseModule {
+  id        String   @id @default(cuid())
+  courseId  String
+  course    Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  title     String   @db.VarChar(200)
+  sortOrder Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  lessons   Lesson[]
+
+  @@index([courseId])
+  @@map("course_modules")
+}
+
+// ── Lesson ────────────────────────────────────────────────────
+model Lesson {
+  id             String       @id @default(cuid())
+  courseModuleId String
+  courseModule   CourseModule @relation(fields: [courseModuleId], references: [id], onDelete: Cascade)
+  title          String       @db.VarChar(200)
+  type           LessonType
+  content        String?      @db.LongText // markdown or video URL
+  videoUrl       String?      @db.VarChar(500)
+  durationSecs   Int?
+  qcReward       Int          @default(5) // QC earned on completion
+  sortOrder      Int          @default(0)
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  progress       LessonProgress[]
+
+  @@index([courseModuleId])
+  @@map("lessons")
+}
+
+// ── CourseEnrollment ──────────────────────────────────────────
+model CourseEnrollment {
+  id           String    @id @default(cuid())
+  userId       String
+  user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  courseId     String
+  course       Course    @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  enrolledAt   DateTime  @default(now())
+  completedAt  DateTime?
+
+  @@unique([userId, courseId])
+  @@index([userId])
+  @@index([courseId])
+  @@map("course_enrollments")
+}
+
+// ── CourseProgress ────────────────────────────────────────────
+model CourseProgress {
+  id               String   @id @default(cuid())
+  userId           String
+  user             User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  courseId         String
+  course           Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  lessonsCompleted Int      @default(0)
+  totalLessons     Int      @default(0)
+  percentComplete  Float    @default(0)
+  lastActivityAt   DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  @@unique([userId, courseId])
+  @@index([userId])
+  @@map("course_progress")
+}
+
+// ── LessonProgress ────────────────────────────────────────────
+model LessonProgress {
+  id          String    @id @default(cuid())
+  userId      String
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  lessonId    String
+  lesson      Lesson    @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  completedAt DateTime  @default(now())
+
+  @@unique([userId, lessonId])
+  @@index([userId])
+  @@index([lessonId])
+  @@map("lesson_progress")
+}
+
+// ── Certificate ───────────────────────────────────────────────
+model Certificate {
+  id           String   @id @default(cuid())
+  userId       String
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  courseId     String
+  course       Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  certificateUrl String? @db.VarChar(500)
+  issuedAt     DateTime @default(now())
+
+  @@unique([userId, courseId])
+  @@index([userId])
+  @@map("certificates")
+}
+
+// ═══════════════════════════════════════════════════════════════
+// DOMAIN 6: AFFILIATE & CASHBACK
+// ═══════════════════════════════════════════════════════════════
+
+// ── AffiliateLink ─────────────────────────────────────────────
+model AffiliateLink {
+  id          String    @id @default(cuid())
+  userId      String
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  code        String    @unique @db.VarChar(20)
+  url         String    @db.VarChar(500)
+  totalClicks Int       @default(0)
+  totalEarned Int       @default(0) // in QC
+  isActive    Boolean   @default(true)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  clicks      AffiliateClick[]
+
+  @@index([userId])
+  @@index([code])
+  @@map("affiliate_links")
+}
+
+// ── AffiliateClick ────────────────────────────────────────────
+model AffiliateClick {
+  id              String        @id @default(cuid())
+  affiliateLinkId String
+  affiliateLink   AffiliateLink @relation(fields: [affiliateLinkId], references: [id], onDelete: Cascade)
+  referredUserId  String?       // null until referral converts
+  ipAddress       String?       @db.VarChar(45)
+  userAgent       String?       @db.VarChar(500)
+  convertedAt     DateTime?
+  qcAwarded       Int?
+  createdAt       DateTime      @default(now())
+
+  cashbackTx      CashbackTransaction?
+
+  @@index([affiliateLinkId])
+  @@index([referredUserId])
+  @@map("affiliate_clicks")
+}
+
+// ── CashbackTransaction ───────────────────────────────────────
+model CashbackTransaction {
+  id               String         @id @default(cuid())
+  userId           String
+  user             User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  affiliateClickId String?        @unique
+  affiliateClick   AffiliateClick? @relation(fields: [affiliateClickId], references: [id], onDelete: SetNull)
+  amountQc         Int
+  purchaseAmount   Float          // original purchase amount in USD
+  cashbackRate     Float          // rate applied (e.g. 0.05 = 5%)
+  windowDays       Int            // cashback window in days
+  expiresAt        DateTime?
+  claimedAt        DateTime?
+  createdAt        DateTime       @default(now())
+
+  @@index([userId])
+  @@map("cashback_transactions")
+}
+
+// ═══════════════════════════════════════════════════════════════
+// DOMAIN 7: BADGES
+// ═══════════════════════════════════════════════════════════════
+
+// ── Badge ─────────────────────────────────────────────────────
+model Badge {
+  id          String        @id @default(cuid())
+  slug        String        @unique @db.VarChar(50)
+  name        String        @db.VarChar(100)
+  description String        @db.Text
+  imageUrl    String        @db.VarChar(500)
+  category    BadgeCategory
+  qcThreshold Int?          // QC balance required to unlock
+  isActive    Boolean       @default(true)
+  createdAt   DateTime      @default(now())
+
+  userBadges  UserBadge[]
+
+  @@index([category])
+  @@map("badges")
+}
+
+// ── UserBadge ─────────────────────────────────────────────────
+model UserBadge {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  badgeId   String
+  badge     Badge    @relation(fields: [badgeId], references: [id], onDelete: Cascade)
+  earnedAt  DateTime @default(now())
+
+  @@unique([userId, badgeId])
+  @@index([userId])
+  @@map("user_badges")
+}
+
+// ═══════════════════════════════════════════════════════════════
+// DOMAIN 8: RAFFLES
+// ═══════════════════════════════════════════════════════════════
+
+// ── Raffle ────────────────────────────────────────────────────
+model Raffle {
+  id             String       @id @default(cuid())
+  title          String       @db.VarChar(200)
+  description    String       @db.Text
+  prizeDescription String     @db.Text
+  imageUrl       String?      @db.VarChar(500)
+  status         RaffleStatus @default(UPCOMING)
+  ticketPriceQc  Int          // cost per ticket in QC
+  maxTickets     Int?         // null = unlimited
+  drawAt         DateTime
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  tickets        RaffleTicket[]
+  winners        RaffleWinner[]
+
+  @@index([status])
+  @@index([drawAt])
+  @@map("raffles")
+}
+
+// ── RaffleTicket ──────────────────────────────────────────────
+model RaffleTicket {
+  id        String   @id @default(cuid())
+  raffleId  String
+  raffle    Raffle   @relation(fields: [raffleId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  quantity  Int      @default(1)
+  createdAt DateTime @default(now())
+
+  @@unique([raffleId, userId])
+  @@index([raffleId])
+  @@index([userId])
+  @@map("raffle_tickets")
+}
+
+// ── RaffleWinner ──────────────────────────────────────────────
+model RaffleWinner {
+  id          String   @id @default(cuid())
+  raffleId    String
+  raffle      Raffle   @relation(fields: [raffleId], references: [id], onDelete: Cascade)
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  prizeDetail String   @db.Text
+  drawnAt     DateTime @default(now())
+  claimedAt   DateTime?
+
+  @@index([raffleId])
+  @@index([userId])
+  @@map("raffle_winners")
+}
+
+// ═══════════════════════════════════════════════════════════════
+// DOMAIN 9: MESSENGER
+// ═══════════════════════════════════════════════════════════════
+
+// ── Conversation ──────────────────────────────────────────────
+model Conversation {
+  id          String             @id @default(cuid())
+  userId      String
+  user        User               @relation("ConversationUser", fields: [userId], references: [id], onDelete: Cascade)
+  adminId     String?
+  admin       User?              @relation("ConversationAdmin", fields: [adminId], references: [id], onDelete: SetNull)
+  status      ConversationStatus @default(OPEN)
+  subject     String?            @db.VarChar(200)
+  unreadCount Int                @default(0)
+  createdAt   DateTime           @default(now())
+  updatedAt   DateTime           @updatedAt
+
+  messages    Message[]
+
+  @@index([userId])
+  @@index([adminId])
+  @@index([status])
+  @@map("conversations")
+}
+
+// ── Message ───────────────────────────────────────────────────
+model Message {
+  id             String        @id @default(cuid())
+  conversationId String
+  conversation   Conversation  @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  authorId       String
+  author         User          @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  body           String        @db.Text
+  status         MessageStatus @default(SENT)
+  isFromAdmin    Boolean       @default(false)
+  createdAt      DateTime      @default(now())
+
+  @@index([conversationId])
+  @@index([authorId])
+  @@map("messages")
+}
+
+// ── CannedResponse ────────────────────────────────────────────
+model CannedResponse {
+  id        String   @id @default(cuid())
+  title     String   @db.VarChar(100)
+  body      String   @db.Text
+  shortcode String   @unique @db.VarChar(30) // e.g. "/welcome"
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([shortcode])
+  @@map("canned_responses")
+}
+
+// ═══════════════════════════════════════════════════════════════
+// DOMAIN 10: NOTIFICATIONS
+// ═══════════════════════════════════════════════════════════════
+
+// ── PushSubscription ──────────────────────────────────────────
+model PushSubscription {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  endpoint  String   @db.Text
+  p256dh    String   @db.VarChar(200)
+  auth      String   @db.VarChar(100)
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@map("push_subscriptions")
+}
+
+// ── Notification ──────────────────────────────────────────────
+model Notification {
+  id        String           @id @default(cuid())
+  userId    String
+  user      User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type      NotificationType
+  title     String           @db.VarChar(200)
+  body      String           @db.Text
+  data      Json?            // typed payload per NotificationType (see notification.types.ts)
+  isRead    Boolean          @default(false)
+  readAt    DateTime?
+  createdAt DateTime         @default(now())
+
+  @@index([userId])
+  @@index([isRead])
+  @@index([type])
+  @@map("notifications")
+}
+
+// ── NotificationPreference ────────────────────────────────────
+model NotificationPreference {
+  id              String   @id @default(cuid())
+  userId          String   @unique
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  emailEnabled    Boolean  @default(true)
+  pushEnabled     Boolean  @default(true)
+  // Per-type toggles stored as JSON: { "NEW_MESSAGE": true, "BADGE_EARNED": false, ... }
+  typePreferences Json?
+  updatedAt       DateTime @updatedAt
+
+  @@map("notification_preferences")
+}
+
+// ═══════════════════════════════════════════════════════════════
+// DOMAIN 11: CONFIGURATION
+// ═══════════════════════════════════════════════════════════════
+
+// ── SiteConfig ────────────────────────────────────────────────
+// Key-value store for dynamic platform configuration.
+// Cached in Redis by SiteConfigService (TTL 300s).
+model SiteConfig {
+  id        String   @id @default(cuid())
+  key       String   @unique @db.VarChar(100)
+  value     String   @db.Text
+  updatedAt DateTime @updatedAt
+
+  @@index([key])
+  @@map("site_configs")
+}
+
+// ── FeatureFlag ───────────────────────────────────────────────
+model FeatureFlag {
+  id          String   @id @default(cuid())
+  key         String   @unique @db.VarChar(100)
+  isEnabled   Boolean  @default(false)
+  description String?  @db.VarChar(300)
+  updatedAt   DateTime @updatedAt
+
+  @@map("feature_flags")
+}
+
+// ═══════════════════════════════════════════════════════════════
+// DOMAIN 12: ADMIN / AUDIT
+// ═══════════════════════════════════════════════════════════════
+
+// ── AdminActionLog ────────────────────────────────────────────
+model AdminActionLog {
+  id          String   @id @default(cuid())
+  adminId     String
+  admin       User     @relation(fields: [adminId], references: [id], onDelete: Cascade)
+  action      String   @db.VarChar(100)
+  targetType  String?  @db.VarChar(50)  // "user" | "course" | "raffle" | etc.
+  targetId    String?  @db.VarChar(100)
+  details     Json?
+  ipAddress   String?  @db.VarChar(45)
+  createdAt   DateTime @default(now())
+
+  @@index([adminId])
+  @@index([action])
+  @@index([createdAt])
+  @@map("admin_action_logs")
+}
+
+// ═══════════════════════════════════════════════════════════════
+// DOMAIN 13: SYSTEM / INFRASTRUCTURE
+// ═══════════════════════════════════════════════════════════════
+
+// ── CronJobLog ────────────────────────────────────────────────
+model CronJobLog {
+  id          String   @id @default(cuid())
+  jobName     String   @db.VarChar(100)
+  status      String   @db.VarChar(20) // "success" | "error" | "skipped"
+  message     String?  @db.Text
+  durationMs  Int?
+  runAt       DateTime @default(now())
+
+  @@index([jobName])
+  @@index([runAt])
+  @@map("cron_job_logs")
+}
+
+// ── WebhookLog ────────────────────────────────────────────────
+model WebhookLog {
+  id          String   @id @default(cuid())
+  source      String   @db.VarChar(50)  // "solana" | "stripe" | etc.
+  event       String   @db.VarChar(100)
+  payload     Json
+  status      String   @db.VarChar(20)  // "processed" | "failed" | "ignored"
+  error       String?  @db.Text
+  receivedAt  DateTime @default(now())
+
+  @@index([source])
+  @@index([event])
+  @@index([receivedAt])
+  @@map("webhook_logs")
+}

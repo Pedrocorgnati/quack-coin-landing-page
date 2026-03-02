@@ -1,0 +1,30 @@
+name: Deploy
+
+on:
+  push:
+    branches: [main]
+
+# Require manual approval before deploying to production
+environment: production
+
+jobs:
+  deploy:
+    name: Deploy to Hostinger VPS
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          port: ${{ secrets.VPS_SSH_PORT }}
+          script: |
+            cd /var/www/quackcoin
+            bash deployment/deploy.sh
+
+# Required GitHub Secrets (set in Settings → Secrets → Actions):
+#   VPS_HOST       — IP address or hostname of the Hostinger VPS
+#   VPS_USER       — SSH user (e.g. root or quackcoin)
+#   VPS_SSH_KEY    — Private SSH key (the VPS must have the public key in authorized_keys)
+#   VPS_SSH_PORT   — SSH port (default: 22)
